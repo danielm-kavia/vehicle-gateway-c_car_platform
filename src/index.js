@@ -1,7 +1,13 @@
 "use strict";
 
 const express = require("express");
-const { createLogger, withCorrelationId, getCorrelationId } = require("@connected-car/shared");
+const {
+  createLogger,
+  withCorrelationId,
+  getCorrelationId,
+  createSecurityHeadersMiddleware,
+  createRateLimitMiddleware,
+} = require("@connected-car/shared");
 const { loadConfig } = require("./config");
 const { createTelematicsPublisher } = require("./telematics/publisher");
 const { createRemoteCommandHandler } = require("./remoteCommands/handler");
@@ -13,6 +19,26 @@ const publisher = createTelematicsPublisher(logger, cfg.publish);
 const remoteCommandHandler = createRemoteCommandHandler(logger, cfg.remoteCommands);
 
 const app = express();
+
+// Hardening (Phase 9): security headers + optional rate limiting (disabled by default).
+app.use(
+  createSecurityHeadersMiddleware({
+    serviceName: cfg.serviceName,
+    enabled: true,
+    enableCsp: String(process.env.SECURITY_ENABLE_CSP || "false").toLowerCase() === "true",
+    csp: process.env.SECURITY_CSP || undefined,
+    enableHsts: String(process.env.SECURITY_ENABLE_HSTS || "false").toLowerCase() === "true",
+  })
+);
+app.use(
+  createRateLimitMiddleware({
+    enabled: String(process.env.RATE_LIMIT_ENABLED || "false").toLowerCase() === "true",
+    windowSeconds: Number(process.env.RATE_LIMIT_WINDOW_S || 60),
+    maxRequests: Number(process.env.RATE_LIMIT_MAX || 100),
+    logger,
+  })
+);
+
 app.use(express.json({ limit: "256kb" }));
 
 /**
