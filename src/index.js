@@ -1,0 +1,84 @@
+"use strict";
+
+const express = require("express");
+const { createLogger, withCorrelationId, getCorrelationId } = require("@connected-car/shared");
+const { loadConfig } = require("./config");
+const { createTelematicsPublisher } = require("./telematics/publisher");
+
+const cfg = loadConfig();
+const logger = createLogger({ serviceName: cfg.serviceName, level: cfg.logLevel });
+
+const publisher = createTelematicsPublisher(logger, cfg.publish);
+
+const app = express();
+app.use(express.json({ limit: "256kb" }));
+
+/**
+ * PUBLIC_INTERFACE
+ * Health endpoint for gateway stub.
+ */
+app.get(
+  "/health",
+  withCorrelationId(logger, async (req, res) => {
+    res.json({
+      ok: true,
+      service: cfg.serviceName,
+      correlationId: getCorrelationId(),
+      telematicsPublish: { enabled: cfg.publish.enabled, mode: cfg.publish.mode },
+    });
+  })
+);
+
+/**
+ * PUBLIC_INTERFACE
+ * Dev-only telemetry publish endpoint (MVP).
+ *
+ * POST /v1/dev/telematics/publish
+ * Body: TelematicsV1 JSON.
+ *
+ * If TELEMATICS_PUBLISH_ENABLED=true, forwards payload to Kafka or ingestion HTTP.
+ */
+app.post(
+  "/v1/dev/telematics/publish",
+  withCorrelationId(logger, async (req, res) => {
+    const payload = req.body;
+    const result = await publisher.publishTelemetry(payload);
+    if (!result.ok) {
+      return res.status(400).json({ ok: false, error: result.error, details: result.details });
+    }
+    return res.status(200).json({ ok: true });
+  })
+);
+
+async function main() {
+  // Start HTTP server; publisher connectivity is optional and should not block preview startup.
+  app.listen(cfg.port, cfg.host || "0.0.0.0", () => {
+    logger.info("Vehicle gateway stub listening", { port: cfg.port });
+  });
+
+  // If kafka mode, connect in background.
+  if (cfg.publish.enabled && cfg.publish.mode === "kafka") {
+    publisher.start().catch((e) => {
+      logger.warn("Telematics publisher failed to start; will remain disabled until restart", {
+        error: String(e && e.message ? e.message : e),
+      });
+    });
+  }
+
+  process.on("SIGINT", async () => {
+    try {
+      await publisher.stop();
+    } catch (_) {}
+    process.exit(0);
+  });
+  process.on("SIGTERM", async () => {
+    try {
+      await publisher.stop();
+    } catch (_) {}
+    process.exit(0);
+  });
+}
+
+main().catch((e) => {
+  logger.error("Fatal startup error", { error: String(e && e.message ? e.message : e) });
+});
