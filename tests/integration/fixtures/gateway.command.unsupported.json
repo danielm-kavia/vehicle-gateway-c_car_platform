@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "v1",
+  "commandId": "11111111-1111-4111-8111-111111111111",
+  "vehicleId": "VIN_INTEGRATION_456",
+  "commandType": "lock",
+  "requestedAt": "2026-01-21T00:00:00.000Z",
+  "parameters": {}
+}

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "v1",
+  "vehicleId": "VIN_INTEGRATION_123",
+  "commandType": "unlock",
+  "requestedAt": "2026-01-21T00:00:00.000Z",
+  "parameters": {}
+}

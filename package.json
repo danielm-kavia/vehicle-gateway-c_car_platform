@@ -14,7 +14,9 @@
     "lint": "node -e \"console.log('lint placeholder (Phase 3)')\"",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:integration": "GATEWAY_TEST_PORT=3204 REMOTE_COMMANDS_TEST_PORT=3206 VEHICLE_GATEWAY_BASE_URL=http://127.0.0.1:3204 REMOTE_COMMANDS_BASE_URL=http://127.0.0.1:3206 AUTH_REQUIRED=false RC_USE_KAFKA=false TELEMATICS_PUBLISH_ENABLED=false jest --config jest.integration.config.js --runInBand",
+    "test:integration:coverage": "GATEWAY_TEST_PORT=3204 REMOTE_COMMANDS_TEST_PORT=3206 VEHICLE_GATEWAY_BASE_URL=http://127.0.0.1:3204 REMOTE_COMMANDS_BASE_URL=http://127.0.0.1:3206 AUTH_REQUIRED=false RC_USE_KAFKA=false TELEMATICS_PUBLISH_ENABLED=false jest --config jest.integration.coverage.config.js --runInBand"
   },
   "dependencies": {
     "@connected-car/shared": "file:../shared-c_car_platform",
@@ -22,6 +24,7 @@
     "kafkajs": "^2.2.4"
   },
   "devDependencies": {
-    "jest": "^30.0.0"
+    "jest": "^30.0.0",
+    "jest-junit": "^16.0.0"
   }
 }
