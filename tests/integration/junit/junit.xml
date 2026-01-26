@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="@connected-car/vehicle-gateway integration (coverage)" tests="4" failures="0" errors="0" time="1.963">
+  <testsuite name="SWE.5 integration: vehicle-gateway ↔ remote-commands" errors="0" failures="0" skipped="0" timestamp="2026-01-26T18:46:21" time="1.926" tests="4">
+    <testcase classname="SWE.5 integration: vehicle-gateway ↔ remote-commands happy path: POST /commands/unlock (remote-commands) dispatches via gateway and reaches ACKED" name="SWE.5 integration: vehicle-gateway ↔ remote-commands happy path: POST /commands/unlock (remote-commands) dispatches via gateway and reaches ACKED" time="0.866" file="tests/integration/gateway-remote-commands.flow.spec.js">
+    </testcase>
+    <testcase classname="SWE.5 integration: vehicle-gateway ↔ remote-commands schema validation error: invalid payload rejected by gateway with 400 (direct gateway contract)" name="SWE.5 integration: vehicle-gateway ↔ remote-commands schema validation error: invalid payload rejected by gateway with 400 (direct gateway contract)" time="0.006" file="tests/integration/gateway-remote-commands.flow.spec.js">
+    </testcase>
+    <testcase classname="SWE.5 integration: vehicle-gateway ↔ remote-commands authorization error: remote-commands returns 401/403 when auth is enabled (skipped in CI harness)" name="SWE.5 integration: vehicle-gateway ↔ remote-commands authorization error: remote-commands returns 401/403 when auth is enabled (skipped in CI harness)" time="0.001" file="tests/integration/gateway-remote-commands.flow.spec.js">
+    </testcase>
+    <testcase classname="SWE.5 integration: vehicle-gateway ↔ remote-commands remote-commands error path: downstream rejection (gateway unsupported commandType) yields 502 with dispatch_failed details" name="SWE.5 integration: vehicle-gateway ↔ remote-commands remote-commands error path: downstream rejection (gateway unsupported commandType) yields 502 with dispatch_failed details" time="0.781" file="tests/integration/gateway-remote-commands.flow.spec.js">
+    </testcase>
+  </testsuite>
+</testsuites>
